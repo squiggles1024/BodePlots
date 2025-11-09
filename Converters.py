@@ -50,7 +50,9 @@ print("\nOpen Loop Vin to Output:\n",V2O_OL)
 ZOUT_OL = ct.TransferFunction([Z0/wzc,Z0],[1]) * ct.TransferFunction([1/wzl,1],[1]) * ct.TransferFunction([1],[1/(w0**2),1/(w0*QF),1])
 print("\nOpen Loop Zout:\n",ZOUT_OL)
 
-CompGain = ct.TransferFunction([1/1000,0],[1])
+CompGainDC = ct.TransferFunction([1],[1])       #example 10/s
+CompGainPoleZeroPair = ct.TransferFunction([1,0],[100])   # (s/3000 + 1)
+CompGain = CompGainDC*CompGainPoleZeroPair
 print("\nCompensator Gain:]n",CompGain)
 
 LoopGain = C2O_OL * CompGain
@@ -114,10 +116,10 @@ plt.xlabel('Time (s)')
 plt.ylabel('Voltage')
 plt.grid(True)
 
-t, y = ct.step_response(ZOUT_OL*ct.TransferFunction([Vout/RLOAD],[1]))
+t, y = ct.impulse_response(ZOUT_OL)
 plt.subplot(2,3,3)
 plt.plot(t, y, 'b', linewidth=2)
-plt.title('OL Load Step Response')
+plt.title('OL Load Impulse Response')
 plt.xlabel('Time (s)')
 plt.ylabel('Voltage')
 plt.grid(True)
@@ -138,10 +140,10 @@ plt.xlabel('Time (s)')
 plt.ylabel('Voltage')
 plt.grid(True)
 
-t, y = ct.step_response(ZOUT_CL*ct.TransferFunction([Vout/RLOAD],[1]))
+t, y = ct.impulse_response(ZOUT_CL)
 plt.subplot(2,3,6)
 plt.plot(t, y, 'b', linewidth=2)
-plt.title('CL Load Step Response')
+plt.title('CL Load Impulse Response')
 plt.xlabel('Time (s)')
 plt.ylabel('Voltage')
 plt.grid(True)
