@@ -17,7 +17,7 @@ Cout = 47*(10**-6)  #Output Filter Capacitance
 Lout = 20*(10**-6)  #Output Filter Inductor
 Vin = 12            #Input Voltage
 Vp = 2.5            #Pulse Width Modulator Peak Voltage
-Vout = 5            #Desired Output Voltage
+Vout = 5           #Desired Output Voltage
 
 D =((RLOAD + RL)/(RLOAD))*(Vout/Vin)
 H0_ctrl = (Vin/Vp)*(RLOAD / (RLOAD + RL))
@@ -41,24 +41,24 @@ print('QF = ', QF)
 # -----------------------------
 # Step 1: Define Transfer Functions
 # -----------------------------
-C2O_OL = ct.TransferFunction([H0_ctrl/wzc,H0_ctrl],[1/(w0**2),1/(w0*QF),1])
+C2O_OL = ct.TransferFunction([H0_ctrl],[1])*ct.TransferFunction([1/wzc,1],[1/(w0**2),1/(w0*QF),1])
 print("\nOpen Loop Control to Output:\n",C2O_OL)
 
-V2O_OL = ct.TransferFunction([H0_vin/wzc,H0_vin],[1/(w0**2),1/(w0*QF),1])
+V2O_OL = ct.TransferFunction([H0_vin],[1])*ct.TransferFunction([1/wzc,1],[1/(w0**2),1/(w0*QF),1])
 print("\nOpen Loop Vin to Output:\n",V2O_OL)
 
-ZOUT_OL = ct.TransferFunction([Z0/wzc,Z0],[1]) * ct.TransferFunction([1/wzl,1],[1]) * ct.TransferFunction([1],[1/(w0**2),1/(w0*QF),1])
+ZOUT_OL = ct.TransferFunction([Z0],[1])*ct.TransferFunction([1/wzc,1],[1]) * ct.TransferFunction([1/wzl,1],[1]) * ct.TransferFunction([1],[1/(w0**2),1/(w0*QF),1])
 print("\nOpen Loop Zout:\n",ZOUT_OL)
 
-CompGainDC = ct.TransferFunction([1],[1])       #example 10/s
-CompGainPoleZeroPair = ct.TransferFunction([1,0],[100])   # (s/3000 + 1)
+CompGainDC = ct.TransferFunction([800],[1])       #example 10/s
+CompGainPoleZeroPair = ct.TransferFunction([1],[1,0])   # (s/3000 + 1)
 CompGain = CompGainDC*CompGainPoleZeroPair
 print("\nCompensator Gain:]n",CompGain)
 
 LoopGain = C2O_OL * CompGain
 print("\nLoop Gain:\n",LoopGain)
 
-C2O_CL = ct.feedback(C2O_OL,1,sign=-1)
+C2O_CL = LoopGain / (1 + LoopGain)
 print("\nClosed Loop Control:]n",C2O_CL)
 
 V2O_CL = V2O_OL / (1 + LoopGain)
@@ -132,7 +132,7 @@ plt.xlabel('Time (s)')
 plt.ylabel('Voltage')
 plt.grid(True)
 
-t, y = ct.step_response(V2O_CL*ct.TransferFunction([Vin],[1]))
+t, y = ct.step_response(V2O_CL)
 plt.subplot(2,3,5)
 plt.plot(t, y, 'b', linewidth=2)
 plt.title('CL Vin Step Response')
