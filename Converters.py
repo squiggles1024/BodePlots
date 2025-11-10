@@ -10,7 +10,7 @@ def parallel(Z1,Z2):
 # Define Laplace variable
 s = sp.Symbol('s')
 
-RC = .001           #Cap ESR
+RC = .45           #Cap ESR
 RL =.080            #Inductor ESR
 RLOAD = 5           #Load Resistance
 Cout = 47*(10**-6)  #Output Filter Capacitance
@@ -50,8 +50,8 @@ print("\nOpen Loop Vin to Output:\n",V2O_OL)
 ZOUT_OL = ct.TransferFunction([Z0],[1])*ct.TransferFunction([1/wzc,1],[1]) * ct.TransferFunction([1/wzl,1],[1]) * ct.TransferFunction([1],[1/(w0**2),1/(w0*QF),1])
 print("\nOpen Loop Zout:\n",ZOUT_OL)
 
-CompGainDC = ct.TransferFunction([800],[1])       #example 10/s
-CompGainPoleZeroPair = ct.TransferFunction([1],[1,0])   # (s/3000 + 1)
+CompGainDC = ct.TransferFunction([1],[1])       #example 10/s
+CompGainPoleZeroPair = ct.TransferFunction([1],[1])   # (s/3000 + 1)
 CompGain = CompGainDC*CompGainPoleZeroPair
 print("\nCompensator Gain:]n",CompGain)
 
@@ -108,7 +108,7 @@ plt.grid(True)
 
 #plt.show()
 
-t, y = ct.step_response(V2O_OL*ct.TransferFunction([Vin],[1]))
+t, y = ct.impulse_response(V2O_OL)
 plt.subplot(2,3,2)
 plt.plot(t, y, 'b', linewidth=2)
 plt.title('OL Vin Step Response')
@@ -132,10 +132,10 @@ plt.xlabel('Time (s)')
 plt.ylabel('Voltage')
 plt.grid(True)
 
-t, y = ct.step_response(V2O_CL)
+t, y = ct.impulse_response(V2O_CL)
 plt.subplot(2,3,5)
 plt.plot(t, y, 'b', linewidth=2)
-plt.title('CL Vin Step Response')
+plt.title('CL Vin Impulse Response')
 plt.xlabel('Time (s)')
 plt.ylabel('Voltage')
 plt.grid(True)
